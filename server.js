@@ -17,3 +17,17 @@ const coinSchema = new mongoose.Schema({
 });
  
 const Coin = mongoose.model('Coin', coinSchema);
+
+const server = http.createServer(async (req, res) => {
+    if (req.method === 'GET' && req.url === '/coins') {
+
+        try {
+          const coins = await Coin.find();
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(coins));
+        } catch (error) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Not found' }));
+        }
+    }
+});
