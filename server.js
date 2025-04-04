@@ -30,4 +30,26 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify({ error: 'Not found' }));
         }
     }
+
+    else if (req.method === 'POST' && req.url === '/coins') {
+
+        let body = '';
+        
+        req.on('data', chunk => {
+          body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            try {
+                const { name, material, country, year, price } = JSON.parse(body);
+                const newCoin = new Coin({ name, material, country, year, price });
+                await newCoin.save();
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Coin added', coin: newCoin }));
+            } catch (error) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Error' }));
+            }
+        });
+    }
 });
