@@ -52,4 +52,22 @@ const server = http.createServer(async (req, res) => {
             }
         });
     }
+
+    else if (req.method === 'DELETE' && req.url.startsWith('/coins/')) {
+
+        const coinId = req.url.split('/')[2];
+        try {
+            const deletedCoin = await Coin.findByIdAndDelete(coinId);
+            if (deletedCoin) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ message: 'Coin deleted', coin: deletedCoin }));
+            } else {
+              res.writeHead(404, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Coin not found' }));
+            }
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error' }));
+        }
+    }
 });
