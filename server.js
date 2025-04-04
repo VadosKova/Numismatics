@@ -99,6 +99,24 @@ const server = http.createServer(async (req, res) => {
           }
         });
     }
+
+    else if (req.method === 'GET' && req.url.startsWith('/coins/material/')) {
+        const material = req.url.split('/')[3];
+
+        try {
+            const coins = await Coin.find({ material: material });
+            if (coins.length > 0) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(coins));
+            } else {
+              res.writeHead(404, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'No coins with this material' }));
+            }
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error' }));
+        }
+    }
 });
 
 
