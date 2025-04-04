@@ -71,7 +71,34 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
+    else if (req.method === 'PUT' && req.url.startsWith('/coins/')) {
+        const coinId = req.url.split('/')[2];
+    
+        let body = '';
 
+        req.on('data', chunk => {
+          body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+          try {
+            const { name, material, country, year, price } = JSON.parse(body);
+    
+            const updatedCoin = await Coin.findByIdAndUpdate(coinId, { name, material, country, year, price }, { new: true });
+    
+            if (updatedCoin) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ message: 'Coin updated', coin: updatedCoin }));
+            } else {
+              res.writeHead(404, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Coin not found' }));
+            }
+          } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Error' }));
+          }
+        });
+    }
 });
 
 
